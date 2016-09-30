@@ -87,7 +87,6 @@ with open(args.filein, 'r') as hmp:
 			# Add these to the matrix
 			geno_matrix.append(genotypes)
 
-
 	# Print the number of samples
 	handle.write(str(n_samples) + '\n')
 	# Print the number of snps
@@ -107,8 +106,9 @@ with open(args.filein, 'r') as hmp:
 
 		# Now iterate across the matrix that we created
 		for i in range(n_snps):
-
+	
 			geno = geno_matrix[i][j]
+
 			# Split
 			geno0 = geno[0]
 			geno1 = geno[1]
