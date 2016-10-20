@@ -78,8 +78,7 @@ columns = ['rs#', 'alleles', 'chrom', 'pos', 'strand', 'assembly#', 'center', 'p
 # Empty list to store matrix components
 geno_matrix = []
 
-# Read in the fastPHASE file
-with open(args.filein, 'r') as fp:
+s
 
 	# Create a switch to activate parsing the genotypic information
 	line_switch = False
