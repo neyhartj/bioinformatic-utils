@@ -201,7 +201,7 @@ date = datetime.now().date().strftime('%Y%m%d')
 handle.write('##fileDate=' + date + '\n')
 # Others
 handle.write('##source=fastPHASEv1.4.8' + '\n')
-handle.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype"' + '\n')
+handle.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">' + '\n')
 handle.write('\t'.join(columns) + '\n')
 
 # Iterate over sites
