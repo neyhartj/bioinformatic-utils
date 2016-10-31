@@ -11,6 +11,7 @@
 # Import modules
 import argparse # To get the arguments
 import sys
+import pprint
 
 
 ####################
@@ -183,14 +184,14 @@ def print_vcf( M, snp_names, snp_info, filename ):
 	# Write the VCF header
 	handle.write('##fileformat=VCFv4.2' + '\n')
 	handle.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">' + '\n')
-	handle.write('##FORMAT=<ID=AD,Number=1,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">' + '\n')
+	handle.write('##FORMAT=<ID=AD,Number=2,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">' + '\n')
 	
 	# Column headers
 	headers_toprint = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT']
 
 	# Extract sample names and add to the headers
 	samples = sorted(M.values()[0].keys())
-	headers_toprint.extend(samples)
+	headers_toprint = headers_toprint + samples
 
 	# Write the VCF column headers
 	handle.write('\t'.join(headers_toprint) + '\n')
@@ -201,19 +202,29 @@ def print_vcf( M, snp_names, snp_info, filename ):
 		# If the site is in the keys for the matrix, continue
 		if site in M.keys():
 
+			toprint = []
+
 			# Find the info in the info_mat and store as a vector to print
-			toprint = snp_info[site]
+			toprint += snp_info[site]
 
 			# Extract the genotype information
-			genos = M[site]
+			genos_toprint = M[site]
+
+			# print M[site]
 
 			# Iterate over the sorted keys, extract the values, and add to a vector
 			for sample in samples:
 
 				# Extract the genotype
-				sample_geno = genos[sample]
+				sample_geno = genos_toprint[sample]
+
+				# print "before",toprint
 
 				toprint.append(':'.join(sample_geno))
+
+				# print "after",toprint
+
+			# print toprint
 
 			# Print
 			handle.write('\t'.join(toprint) + '\n')
@@ -283,30 +294,31 @@ vcfin = args.vcfin
 # Notify the user
 print "\nParsing the VCF... "
 
+# Create a matrix of genotype calls
+# The matrix will be a dictionary, where the key
+# is the site name and the value is the dictionary of entry genotypes
+mat = {}
+# Create a matrix of SNP information (i.e. pos, id, ref, alt, etc)
+info_mat = {}
+# Vector of headers
+vcf_headers = []
+# Vector of column names
+headers = []
+# Vector of SNP names (keep the order to retrieve later)
+snp_names = []
+
+# Empty number of samples scalar
+n_entries = 0
+
+# Empty scalar for the index of the first genotypes
+entries_index = 0
+
+# Empty vector of entry names
+entries = []
+
+
 # Open and parse the VCF file to extract genotype information to a matrix
 with open(vcfin, 'r') as vcf:
-
-	# Create a matrix of genotype calls
-	# The matrix will be a dictionary, where the key
-	# is the site name and the value is the dictionary of entry genotypes
-	mat = {}
-	# Create a matrix of SNP information (i.e. pos, id, ref, alt, etc)
-	info_mat = {}
-	# Vector of headers
-	vcf_headers = []
-	# Vector of column names
-	headers = []
-	# Vector of SNP names (keep the order to retrieve later)
-	snp_names = []
-
-	# Empty number of samples scalar
-	n_entries = 0
-
-	# Empty scalar for the index of the first genotypes
-	entries_index = 0
-
-	# Empty vector of entry names
-	entries = []
 
 	# Iterate over lines
 	for line in vcf:
@@ -467,6 +479,7 @@ for family in families:
 		combined_mat[site] = site_combined
 
 
+
 	# For some reason the parent monomorphic VCF needs to be written first...
 	## Notify
 	print "\nWriting the VCF of monomorphic parent genotypes...\n"
@@ -474,6 +487,7 @@ for family in families:
 	filename = args.vcfout + "_family" + family + "_parent_monomorphic"
 	# Print
 	print_vcf(parent_genos_mono, snp_names, info_mat, filename)
+
 
 	# Print the combined VCF
 	## Notify
