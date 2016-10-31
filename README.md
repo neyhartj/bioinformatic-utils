@@ -26,7 +26,7 @@ TASSEL or suitable for the `rrBLUP` R package.
 ### Filtering and Prep
 
 `LB_impute_vcf_prep.py` filters and prepared VCF files for used in the imputation
-program [LB-Impute]("https://github.com/dellaporta-laboratory/LB-Impute"). It requires
+program (LB-Impute)["https://github.com/dellaporta-laboratory/LB-Impute"]. It requires
 a VCF and a pedigree file. The program first filters parents based on markers that
 are homozygous within parents and polymorphic between parents. The program then
 evaluates progeny for degree of missingness.
