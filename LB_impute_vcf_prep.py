@@ -186,7 +186,7 @@ def print_vcf( M, snp_names, snp_info, filename ):
 	handle.write('##FORMAT=<ID=AD,Number=1,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">' + '\n')
 	
 	# Column headers
-	headers_toprint = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT']
+	headers_toprint = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT']
 
 	# Extract sample names and add to the headers
 	samples = sorted(M.values()[0].keys())
