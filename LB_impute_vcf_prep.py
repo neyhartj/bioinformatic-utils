@@ -11,7 +11,6 @@
 # Import modules
 import argparse # To get the arguments
 import sys
-import pprint
 
 
 ####################
@@ -78,18 +77,9 @@ def parent_eval(M, parents):
 			# Is there one missing value?
 			if any([call == './.' for call in gt.values()]):
 
-				# Is the other genotype a het?
-				if any([call == '0/1' for call in gt.values()]):
-
-					# Set both to missing, but keep allele depth
-					new_parent_genos = dict((key, ['./.', value[1]]) for key, value in parent_genos.iteritems())
-					correct_mat[site] = new_parent_genos
-
-				# The other genotype must be homozygous
-				# In this case, keep the genotypes unchanged
-				else:
-
-					correct_mat[site] = parent_genos	
+				# Set both to missing, but keep allele depth
+				new_parent_genos = dict((key, ['./.', value[1]]) for key, value in parent_genos.iteritems())
+				correct_mat[site] = new_parent_genos
 
 			# If there isn't a single missing value, both sites must have values (duh)
 			# The remaining options here are the following:
@@ -100,18 +90,12 @@ def parent_eval(M, parents):
 
 				# Is one genotype a het?
 				if any([call == '0/1' for call in gt.values()]):
+				
+					# Set both to missing, but keep allele depth
+					new_parent_genos = dict((key, ['./.', value[1]]) for key, value in parent_genos.iteritems())
+					correct_mat[site] = new_parent_genos
 
-					# Where is the het?
-					het_ind = gt.values().index('0/1')
-					# What is the key for the het?
-					het_key = gt.keys()[het_ind]
-
-					# Replace the het with missing
-					parent_genos[het_key][0] = './.'
-
-					correct_mat[site] = parent_genos
-
-				# If it is not a het, both genotypes must be homozygous
+				# If one is not a het, both genotypes must be homozygous
 				else:
 
 					correct_mat[site] = parent_genos
@@ -210,26 +194,16 @@ def print_vcf( M, snp_names, snp_info, filename ):
 			# Extract the genotype information
 			genos_toprint = M[site]
 
-			# print M[site]
-
 			# Iterate over the sorted keys, extract the values, and add to a vector
 			for sample in samples:
 
 				# Extract the genotype
 				sample_geno = genos_toprint[sample]
 
-				# print "before",toprint
-
 				toprint.append(':'.join(sample_geno))
-
-				# print "after",toprint
-
-			# print toprint
 
 			# Print
 			handle.write('\t'.join(toprint) + '\n')
-
-			toprint = []
 
 	# Close the file
 	handle.close()
