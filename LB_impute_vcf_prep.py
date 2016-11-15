@@ -169,6 +169,7 @@ def print_vcf( M, snp_names, snp_info, filename ):
 	handle.write('##fileformat=VCFv4.2' + '\n')
 	handle.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">' + '\n')
 	handle.write('##FORMAT=<ID=AD,Number=2,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">' + '\n')
+	handle.write('##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">')
 	
 	# Column headers
 	headers_toprint = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT']
@@ -335,7 +336,7 @@ with open(vcfin, 'r') as vcf:
 			QUAL = '.'
 			FILTER = '.'
 			INFO = '.'
-			FORMAT = 'GT:AD'
+			FORMAT = 'GT:AD:DP'
 
 			# Store #CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO, and FORMAT
 			info_mat[snp_name] = [CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO, FORMAT]
@@ -356,9 +357,11 @@ with open(vcfin, 'r') as vcf:
 				gt = call[0]
 				# Allele depth
 				ad = call[1]
+				# Total depth
+				dp = call[2]
 
 				# Add the gt and ad to the dictionary
-				site_genos[entry] = [gt, ad]
+				site_genos[entry] = [gt, ad, dp]
 
 			# Add the site dictionary to the matrix
 			mat[snp_name] = site_genos
