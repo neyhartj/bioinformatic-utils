@@ -58,7 +58,7 @@ def parent_eval(M, parents):
 			elif all([call == '0/1' for call in gt.values()]):
 
 				# Ouput missing
-				new_parent_genos = dict((key, ['./.', value[1]]) for key, value in parent_genos.iteritems())
+				new_parent_genos = dict((key, ['./.'] + value[1:]) for key, value in parent_genos.iteritems())
 				correct_mat[site] = new_parent_genos
 
 			# The remaining option is that both parents are homozygous for the same allele
@@ -66,7 +66,7 @@ def parent_eval(M, parents):
 			else:
 
 				# Set both to missing, but keep allele depth
-				new_parent_genos = dict((key, ['./.', value[1]]) for key, value in parent_genos.iteritems())
+				new_parent_genos = dict((key, ['./.'] + value[1:]) for key, value in parent_genos.iteritems())
 				correct_mat[site] = new_parent_genos
 
 				homozygous_mat[site] = parent_genos
@@ -78,7 +78,7 @@ def parent_eval(M, parents):
 			if any([call == './.' for call in gt.values()]):
 
 				# Set both to missing, but keep allele depth
-				new_parent_genos = dict((key, ['./.', value[1]]) for key, value in parent_genos.iteritems())
+				new_parent_genos = dict((key, ['./.'] + value[1:]) for key, value in parent_genos.iteritems())
 				correct_mat[site] = new_parent_genos
 
 			# If there isn't a single missing value, both sites must have values (duh)
@@ -92,7 +92,7 @@ def parent_eval(M, parents):
 				if any([call == '0/1' for call in gt.values()]):
 				
 					# Set both to missing, but keep allele depth
-					new_parent_genos = dict((key, ['./.', value[1]]) for key, value in parent_genos.iteritems())
+					new_parent_genos = dict((key, ['./.'] + value[1:]) for key, value in parent_genos.iteritems())
 					correct_mat[site] = new_parent_genos
 
 				# If one is not a het, both genotypes must be homozygous
@@ -169,7 +169,7 @@ def print_vcf( M, snp_names, snp_info, filename ):
 	handle.write('##fileformat=VCFv4.2' + '\n')
 	handle.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">' + '\n')
 	handle.write('##FORMAT=<ID=AD,Number=2,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">' + '\n')
-	handle.write('##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">')
+	handle.write('##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">' + '\n')
 	
 	# Column headers
 	headers_toprint = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT']
@@ -366,6 +366,8 @@ with open(vcfin, 'r') as vcf:
 			# Add the site dictionary to the matrix
 			mat[snp_name] = site_genos
 
+			
+
 print "Done\n"
 
 
@@ -433,6 +435,9 @@ for family in families:
 	# The first entry in that list is the correct VCF for parents. The second entry
 	## are the monomorphic sites (still usefull)
 	parent_genos_touse = eval_parent_genos[0]
+
+	#print parent_genos_touse
+
 	parent_genos_mono = eval_parent_genos[1]
 
 	# Subset the progeny
