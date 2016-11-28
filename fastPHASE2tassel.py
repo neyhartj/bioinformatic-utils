@@ -30,6 +30,11 @@ parser.add_argument('-t',
 				metavar = 'TIN',
 				help = 'The original TASSEL file converted to the fastPHASE input file.',
 				required = True)
+# Should alleles filtered by the probability threshold be removed?
+parser.add_argument('-f',
+				'--filter',
+				help = 'Flag: should those genotype calls that did not meet the fastPHASE probability threshold be removed?',
+				action = 'store_true')
 # Output file name
 parser.add_argument('-o',
                 '--fileout',
@@ -68,17 +73,16 @@ with open(args.tinput, 'r') as tin:
 			# Append this information
 			snp_info.append(tmp[0:4])
 
-# Find the number of snps
-n_snps = len(snp_info)
-
 
 # List to store column names / sample names
 columns = ['rs#', 'alleles', 'chrom', 'pos', 'strand', 'assembly#', 'center', 'protLSID', 'assayLSID', 'panelLSID', 'QCcode']
 
+
 # Empty list to store matrix components
 geno_matrix = []
 
-s
+# Read in the fastPHASE file
+with open(args.filein, 'r') as fp:
 
 	# Create a switch to activate parsing the genotypic information
 	line_switch = False
@@ -96,7 +100,7 @@ s
 			else:
 				continue
 
-		# If the line switch is one, begin parsing
+		# If the line switch is on, begin parsing
 		else:
 
 			# If the line begins with #, it is a sample name
@@ -105,7 +109,7 @@ s
 				# Strip and split on spaces
 				tmp = line.strip().split(' ')
 
-				# The sample name is the second entry
+				# The sample name is the third entry
 				name = tmp[1]
 				# Append it to the columns list
 				columns.append(name)
@@ -123,8 +127,14 @@ s
 				geno_matrix.append(tmp)
 
 
+
 # Print the column names line
 handle.write('\t'.join(columns) + '\n')
+
+# The number of entries is one-half of the length of the geno_matrix (for diploid)
+n_entries = len(geno_matrix) / 2
+# The number of sites
+n_sites = len(snp_info)
 
 
 ## Now lets play around with this new geno_matrix
@@ -148,14 +158,31 @@ for i in range(len(snp_info)):
 		allele1 = geno_matrix[j][i]
 		allele2 = geno_matrix[j+1][i]
 
-		# Convert to N if necessary
-		if allele1 == "?":
-			allele1 = "N"
-		if allele2 == "?":
-			allele1 = "N"
+		# If one of the alleles has a bracket, set to missing
+		if '[' in allele1 or '[' in allele2:
 
-		# Concatenate allele information
-		geno = str(allele1) + str(allele2)
+			# If the flag is true, set to NN
+			if (args.filter):
+
+				geno = 'NN'
+
+			# Otherwise just remove the brackets
+			else:
+				allele1 = allele1.strip('[]')
+				allele2 = allele2.strip('[]')
+
+				geno = str(allele1) + str(allele2)
+
+		else:
+
+			# Convert to N if necessary
+			if allele1 == "?":
+				allele1 = "N"
+			if allele2 == "?":
+				allele1 = "N"
+
+			# Concatenate allele information
+			geno = str(allele1) + str(allele2)
 
 		# Extend the toprint list
 		toprint.append(geno)
