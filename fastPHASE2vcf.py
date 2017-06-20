@@ -107,8 +107,8 @@ with open(args.filein, 'r') as fp:
 				# Strip and split on spaces
 				tmp = line.strip().split(' ')
 
-				# The sample name is the third entry
-				name = tmp[2]
+				# The sample name is the second entry
+				name = tmp[1]
 				# Append it to the columns list
 				columns.append(name)
 
