@@ -48,7 +48,7 @@ def rrBLUP_hapmap(VCF):
       toprint = []
 
       tmp = line.strip().split('\t')
-
+	
       # Assigning variable
       chrom = tmp[0]
       position = tmp[1]
